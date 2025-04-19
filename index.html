@@ -22,7 +22,7 @@
       <form id="signin" class="form-tab active">
         <h2 class="title">Welcome Back</h2>
         <label>Email Address</label>
-        <input type="email" required />
+        <input type="email" id="login-email" required />
         
         <label>Password</label>
         <div class="password-row">
@@ -37,6 +37,7 @@
           <span>Remember me</span>
         </div>
 
+        <p id="signin-error" style="color: red;"></p>
         <button type="submit" class="auth-btn">➤ Sign In</button>
       </form>
 
@@ -60,18 +61,18 @@
         </div>
 
         <label>Email Address</label>
-        <input type="email" required />
+        <input type="email" id="signup-email" required />
 
         <label>Password</label>
         <div class="password-row">
-          <input type="password" id="password" required />
-          <i class="fas fa-eye toggle-pass" onclick="togglePassword('password', this)"></i>
+          <input type="password" id="signup-password" required />
+          <i class="fas fa-eye toggle-pass" onclick="togglePassword('signup-password', this)"></i>
         </div>
 
         <label>Confirm Password</label>
         <div class="password-row">
-          <input type="password" id="confirm" required />
-          <i class="fas fa-eye toggle-pass" onclick="togglePassword('confirm', this)"></i>
+          <input type="password" id="signup-confirm" required />
+          <i class="fas fa-eye toggle-pass" onclick="togglePassword('signup-confirm', this)"></i>
         </div>
 
         <label>Select Side</label>
@@ -86,6 +87,7 @@
           <label for="terms">I agree to Terms & Conditions</label>
         </div>
 
+        <p id="signup-error" style="color: red;"></p>
         <button type="submit" class="auth-btn">➤ Sign Up</button>
       </form>
     </div>
@@ -110,6 +112,43 @@
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
     }
+
+    // Sign Up Logic
+    document.getElementById("signup").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const email = document.getElementById("signup-email").value;
+      const pass = document.getElementById("signup-password").value;
+      const confirm = document.getElementById("signup-confirm").value;
+
+      if (pass !== confirm) {
+        document.getElementById("signup-error").textContent = "Passwords do not match.";
+        return;
+      }
+
+      // Save credentials (insecure for demo purposes)
+      localStorage.setItem("userEmail", email);
+      localStorage.setItem("userPass", pass);
+      localStorage.setItem("isLoggedIn", "true");
+
+      window.location.href = "dashboard.html";
+    });
+
+    // Sign In Logic
+    document.getElementById("signin").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const pass = document.getElementById("login-password").value;
+
+      const storedEmail = localStorage.getItem("userEmail");
+      const storedPass = localStorage.getItem("userPass");
+
+      if (email === storedEmail && pass === storedPass) {
+        localStorage.setItem("isLoggedIn", "true");
+        window.location.href = "dashboard.html";
+      } else {
+        document.getElementById("signin-error").textContent = "Invalid credentials.";
+      }
+    });
   </script>
 </body>
 </html>
