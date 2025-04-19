@@ -957,3 +957,33 @@
   <script src="dashboard.js"></script>
 </body>
   </html>
+
+<!-- dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <script>
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+      window.location.href = "index.html"; // redirect to login if not logged in
+    }
+  </script>
+
+  <div class="dashboard-container">
+    <h1>Welcome to Dashboard</h1>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script src="dashboard.js"></script>
+  <script>
+    function logout() {
+      localStorage.removeItem("isLoggedIn");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
