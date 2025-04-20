@@ -6,7 +6,10 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "https://vk80840.github.io", // your GitHub Pages domain
+  credentials: true,
+}));
 app.use(express.json());
 
 // Use the port provided by the environment or default to 5000
