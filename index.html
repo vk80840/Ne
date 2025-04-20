@@ -94,62 +94,92 @@
   </div>
 
   <script>
-    function togglePassword(id, el) {
-      const input = document.getElementById(id);
-      if (input.type === "password") {
-        input.type = "text";
-        el.classList.replace("fa-eye", "fa-eye-slash");
-      } else {
-        input.type = "password";
-        el.classList.replace("fa-eye-slash", "fa-eye");
-      }
+  const API_BASE = 'https://your-backend.onrender.com/api/auth'; // Replace with your actual Render backend URL
+
+  function togglePassword(id, el) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+    el.classList.toggle("fa-eye-slash");
+    el.classList.toggle("fa-eye");
+  }
+
+  function showTab(id, btn) {
+    document.querySelectorAll(".form-tab").forEach(f => f.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  }
+
+  // Sign Up Handler
+  document.getElementById("signup").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const inputs = this.querySelectorAll("input, select");
+    const [referralId, firstName, lastName, mobileInput, , emailInput, passwordInput, confirmInput, , sideSelect] = inputs;
+
+    const mobile = mobileInput.value;
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    const confirm = confirmInput.value;
+    const side = sideSelect.value;
+
+    if (password !== confirm) {
+      document.getElementById("signup-error").textContent = "Passwords do not match.";
+      return;
     }
 
-    function showTab(id, btn) {
-      document.querySelectorAll(".form-tab").forEach(f => f.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
+    try {
+      const res = await fetch(`${API_BASE}/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          referralId: referralId.value,
+          firstName: firstName.value,
+          lastName: lastName.value,
+          mobile,
+          email,
+          password,
+          side
+        })
+      });
 
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-    }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Signup failed");
 
-    // Sign Up Logic
-    document.getElementById("signup").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const email = document.getElementById("signup-email").value;
-      const pass = document.getElementById("signup-password").value;
-      const confirm = document.getElementById("signup-confirm").value;
-
-      if (pass !== confirm) {
-        document.getElementById("signup-error").textContent = "Passwords do not match.";
-        return;
-      }
-
-      // Save credentials (insecure for demo purposes)
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("userPass", pass);
+      localStorage.setItem("token", data.token);
       localStorage.setItem("isLoggedIn", "true");
-
       window.location.href = "dashboard.html";
-    });
+    } catch (err) {
+      document.getElementById("signup-error").textContent = err.message;
+    }
+  });
 
-    // Sign In Logic
-    document.getElementById("signin").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const email = document.getElementById("login-email").value;
-      const pass = document.getElementById("login-password").value;
+  // Sign In Handler
+  document.getElementById("signin").addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-      const storedEmail = localStorage.getItem("userEmail");
-      const storedPass = localStorage.getItem("userPass");
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
 
-      if (email === storedEmail && pass === storedPass) {
-        localStorage.setItem("isLoggedIn", "true");
-        window.location.href = "dashboard.html";
-      } else {
-        document.getElementById("signin-error").textContent = "Invalid credentials.";
-      }
-    });
-  </script>
+    try {
+      const res = await fetch(`${API_BASE}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Login failed");
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("isLoggedIn", "true");
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      document.getElementById("signin-error").textContent = err.message;
+    }
+  });
+</script>
   <script src="routes/auth.js"></script>
 </body>
 </html>
